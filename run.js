@@ -1,10 +1,22 @@
 const { spawnSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
 
 let contracts = 0;
+const buildDir =  path.join(__dirname, "build");
+
+// const truffleCmd = '/home/amal/.nvm/versions/node/v16.14.2/bin/truffle';
+const truffleCmd = '/home/amal/work/truffle/packages/core/cli.js';
+
+const cleanBuildArtifacts = () => {
+  if (fs.existsSync(buildDir)){
+    fs.rmdirSync(path.join(__dirname, "build"), { recursive: true});
+  }
+}
 
 const runTruffle = () => {
-  // spawnSync('/home/amal/.nvm/versions/node/v16.14.2/bin/truffle', ['migrate', '--network', 'ganache', '--to', `${++contracts}`]);
-  spawnSync('/home/amal/work/truffle/packages/core/cli.js', ['migrate', '--network', 'ganache', '--to', `${++contracts}`]);
+  cleanBuildArtifacts();
+  spawnSync(truffleCmd, ['migrate', '--network', 'ganache', '--to', `${++contracts}`]);
 }
 
 const main = async () => {
