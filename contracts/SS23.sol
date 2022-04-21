@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.235 <0.9.0;
+pragma solidity >=0.4.25 <0.9.0;
 
 contract SimpleStorage23 {
   uint storedData;
