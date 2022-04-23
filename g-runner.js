@@ -21,16 +21,28 @@ const expectedKeys = [
   'eth_blockNumber',
 ];
 
-fs.writeFileSync(`report.csv`, expectedKeys.join(',') + '\n', {flag: 'w'});
+// create new output file
+fs.writeFileSync('report.csv', '', {flag: 'w'});
 
-const initializeCounter = () => {
+const writeNewHeader = (skipLines = 0, summaryText ='') => {
+  const colHeadings = expectedKeys.join(',') + '\n';
+  const output = '\n'.repeat(skipLines+1) + summaryText + '\n' + colHeadings;
+  fs.writeFileSync('report.csv', output, {flag: 'a'});
+}
+
+const resetContractCount = () => {
+  numContracts = 0;
+}
+
+
+const resetCounter = () => {
   counter = {
     total: 0,
     "#Contracts": ++numContracts
   }
 }
 
-const dumpCount = () => {
+const recordCount = () => {
   const csv = expectedKeys.map(k => counter[k]).join(',');
   console.log(csv);
   fs.writeFileSync(`report.csv`, csv + '\n', {flag: 'a'});
@@ -59,19 +71,28 @@ const main = async () => {
 
   process.on('message', async (m) => {
     switch (m.cmd) {
-      case 'start':
-        console.log('CHILD: initialize ganache');
-        initializeCounter();
-        process.send({cmd: 'start_ack'});
+      case 'header':
+        writeNewHeader(3, m.summary || '"new series"');
+        resetContractCount();
+
+        process.send({cmd: 'header:ack'});
         break;
 
-      case 'report':
-        console.log('CHILD: report ganache count');
-        dumpCount();
-        process.send({cmd: 'report_ack'});
+      case 'count':
+        console.log('CHILD: initialize ganache');
+        resetCounter();
+
+        process.send({cmd: 'count:ack'});
+        break;
+
+      case 'save':
+        console.log('CHILD: save ganache count');
+        recordCount();
+
+        process.send({cmd: 'save:ack'});
         break;
         
-      case 'shutdown':
+      case 'finish':
         console.log('CHILD: got shutdown');
         await ganache.close();
         process.exit(0);
