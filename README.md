@@ -9,7 +9,7 @@ You'll have to modify the `run.js` to an appropriate truffle location for your e
 1. `npm ci`
 1. `node src`
 
-If all goes well, a `report.csv` will be in the project root folder.
+If all goes well, a [`report.csv` similar to this](./sample-report.csv) will be in the project root folder.
 
 ## Notes
 
