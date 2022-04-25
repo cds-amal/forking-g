@@ -4,6 +4,7 @@ const path = require("path");
 
 let contracts = 0;
 const buildDir =  path.join(__dirname, "build");
+const RUNS = 5;
 
 const truffleProd = '/home/amal/.nvm/versions/node/v16.14.2/bin/truffle';
 const truffleDev = '/home/amal/work/truffle/packages/core/cli.js';
@@ -18,14 +19,18 @@ const cleanBuildArtifacts = () => {
 
 const runTruffle = (cmd) => {
   cleanBuildArtifacts();
-  spawnSync(cmd, ['migrate', '--network', 'ganache', '--to', `${++contracts}`]);
+  const startTime = new Date();
+  spawnSync(cmd, ['migrate', '--network', 'ganache', '--to', `${++contracts}`], { cwd: path.resolve(__dirname, "..", "dapp")})
+
+  //return migration "runtime" in ms
+  return new Date() - startTime;
 }
 
 let cmdIndex = 0;
 
 const main = async () => {
   const cp = require('child_process');
-  const n = cp.fork(`${__dirname}/g-runner.js`);
+  const n = cp.fork(`${__dirname}/ganache-runner.js`);
 
   n.on('message', (m) => {
     console.log('PARENT got message:', m);
@@ -35,12 +40,12 @@ const main = async () => {
         break;
 
       case 'count:ack':
-        runTruffle(cmds[cmdIndex]);
-        n.send({ cmd: "save" });
+        const runTime = runTruffle(cmds[cmdIndex]);
+        n.send({ cmd: "save", runTime });
         break;
 
       case 'save:ack':
-        if (contracts === 25) {
+        if (contracts === RUNS) {
           if (++cmdIndex === cmds.length) {
             n.send({ cmd: "finish" });
           } else {

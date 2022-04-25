@@ -6,7 +6,8 @@ let counter;
 let numContracts = 0;
 const expectedKeys = [
   '#Contracts',
-  'total',
+  'total Runtime',
+  'total RPC calls',
   'net_version',
   'eth_sendRawTransaction',
   'eth_getTransactionReceipt',
@@ -37,7 +38,7 @@ const resetContractCount = () => {
 
 const resetCounter = () => {
   counter = {
-    total: 0,
+  'total RPC calls': 0,
     "#Contracts": ++numContracts
   }
 }
@@ -57,7 +58,7 @@ const startGanache = async () => {
     logger: {
       log: e => {
         counter[e] = (counter[e] || 0) + 1;
-        counter.total += 1;
+        counter['total RPC calls'] += 1;
       }
     }
   };
@@ -87,6 +88,7 @@ const main = async () => {
 
       case 'save':
         console.log('CHILD: save ganache count');
+        counter['total Runtime'] = m.runTime;
         recordCount();
 
         process.send({cmd: 'save:ack'});
