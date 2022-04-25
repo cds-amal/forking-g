@@ -4,6 +4,21 @@ const mnemonic = "window twenty cat alone physical foam smoke annual collect plu
 
 let counter;
 let numContracts = 0;
+
+// track total migration time
+let migrationStartTime;
+let lastKnownRPCTime;
+
+const setMigrationStartTime = () => {
+  migrationStartTime = new Date();
+}
+
+const calculateMigrationTotalTime = ()  => counter['total Runtime'] = lastKnownRPCTime - migrationStartTime;
+
+const updateLastKnownRPCTime = () => {
+  lastKnownRPCTime = new Date();
+}
+
 const expectedKeys = [
   '#Contracts',
   'total Runtime',
@@ -35,8 +50,8 @@ const resetContractCount = () => {
   numContracts = 0;
 }
 
-
 const resetCounter = () => {
+  setMigrationStartTime();
   counter = {
   'total RPC calls': 0,
     "#Contracts": ++numContracts
@@ -44,6 +59,7 @@ const resetCounter = () => {
 }
 
 const recordCount = () => {
+  calculateMigrationTotalTime();
   const csv = expectedKeys.map(k => counter[k]).join(',');
   console.log(csv);
   fs.writeFileSync(`report.csv`, csv + '\n', {flag: 'a'});
@@ -57,6 +73,7 @@ const startGanache = async () => {
     },
     logger: {
       log: e => {
+        updateLastKnownRPCTime();
         counter[e] = (counter[e] || 0) + 1;
         counter['total RPC calls'] += 1;
       }
@@ -88,7 +105,6 @@ const main = async () => {
 
       case 'save':
         console.log('CHILD: save ganache count');
-        counter['total Runtime'] = m.runTime;
         recordCount();
 
         process.send({cmd: 'save:ack'});

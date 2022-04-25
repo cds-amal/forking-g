@@ -4,7 +4,7 @@ const path = require("path");
 
 let contracts = 0;
 const buildDir =  path.join(__dirname, "build");
-const RUNS = 5;
+const RUNS = 25;
 
 const truffleProd = '/home/amal/.nvm/versions/node/v16.14.2/bin/truffle';
 const truffleDev = '/home/amal/work/truffle/packages/core/cli.js';
@@ -19,11 +19,7 @@ const cleanBuildArtifacts = () => {
 
 const runTruffle = (cmd) => {
   cleanBuildArtifacts();
-  const startTime = new Date();
   spawnSync(cmd, ['migrate', '--network', 'ganache', '--to', `${++contracts}`], { cwd: path.resolve(__dirname, "..", "dapp")})
-
-  //return migration "runtime" in ms
-  return new Date() - startTime;
 }
 
 let cmdIndex = 0;
@@ -41,7 +37,7 @@ const main = async () => {
 
       case 'count:ack':
         const runTime = runTruffle(cmds[cmdIndex]);
-        n.send({ cmd: "save", runTime });
+        n.send({ cmd: "save" });
         break;
 
       case 'save:ack':
