@@ -7,11 +7,13 @@ add conracts
 You'll have to modify the `run.js` to an appropriate truffle location for your env.
 
 1. `npm ci`
-1. `node run`
+1. `node src`
 
-If all goes well, a `report.csv` will be in the cwd.
+If all goes well, a `report.csv` will be in the project root folder.
 
 ## Notes
+
+Maybe some useful notes?
 
 ### Scaffold a truffle project
 
