@@ -1,5 +1,11 @@
 WIP: an easier-ish way to test different truffle profiles against Ganache
 
+## TODO
+
+- [ ] add configuration to load truffle alias 
+- [ ] worktree
+- [ ] non-worktree
+
 add conracts
 
 ## Run it
